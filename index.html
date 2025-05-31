@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>مدير كلمات المرور - تصميم عصري</title>
+<style>
+  /* خطوط */
+  @import url('https://fonts.googleapis.com/css2?family=Cairo&display=swap');
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Cairo', sans-serif;
+    background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+    color: #1f2937;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
+    box-sizing: border-box;
+  }
+  #app {
+    background: #fff;
+    width: 900px;
+    max-width: 95vw;
+    border-radius: 14px;
+    box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+    padding: 30px 40px 40px 40px;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 2.6rem;
+    color: #334155;
+  }
+
+  /* أقسام */
+  section {
+    margin-bottom: 35px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 1.15rem;
+    color: #475569;
+  }
+
+  input[type="text"], input[type="password"], input[type="number"], input[type="file"] {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    border: 1.8px solid #cbd5e1;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+  }
+  input[type="text"]:focus, input[type="password"]:focus, input[type="number"]:focus, input[type="file"]:focus {
+    border-color: #3b82f6;
+    outline: none;
+  }
+
+  button {
+    background-color: #3b82f6;
+    color: #fff;
+    border: none;
+    padding: 14px 28px;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 12px;
+  }
+  button:hover:not(:disabled) {
+    background-color: #2563eb;
+  }
+  button:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background-color: #64748b;
+  }
+  .btn-secondary:hover {
+    background-color: #475569;
+  }
+
+  /* رسائل الخطأ */
+  .error {
+    color: #dc2626;
+    font-weight: 600;
+    margin-top: 6px;
+    font-size: 1rem;
+  }
+
+  /* قسم المصادقة */
+  #authSection {
+    max-width: 400px;
+    margin: 0 auto 50px auto;
+  }
+
+  #lockNotice {
+    background: #fef3f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-weight: 700;
+    text-align: center;
+    display: none;
+  }
+
+  /* قسم التطبيق الرئيسي */
+  #mainApp {
+    display: none;
+  }
+
+  /* قسم توليد كلمات المرور */
+  #generator {
+    margin-bottom: 40px;
+  }
+  #generatedPassword {
+    font-weight: 700;
+    font-size: 1.6rem;
+    margin-top: 12px;
+    background: #e0f2fe;
+    padding: 14px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    user-select: all;
+    color: #0369a1;
+  }
+
+  /* سجل كلمات المرور */
+  #entriesTable {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  #entriesTable th, #entriesTable td {
+    border-bottom: 1px solid #cbd5e1;
+    padding: 12px 15px;
+    font-size: 1.1rem;
+  }
+  #entriesTable th {
+    background-color: #e2e8f0;
+    color: #334155;
+    text-align: right;
+  }
+  #entriesTable td.passwordCell {
+    font-family: 'Courier New', Courier, monospace;
+    color: #334155;
+  }
+  #entriesTable td.passwordCell.hiddenPass {
+    filter: blur(5px);
+  }
+  #entriesTable tr:hover {
+    background-color: #f1f5f9;
+  }
+
+  /* أدوات البحث */
+  #searchInput {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  /* أزرار التحكم */
+  #controls {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  #controls button {
+    flex: 1 1 140px;
+  }
+
+  /* القسم السفلي (تغيير كلمة المرور، استيراد، تصدير) */
+  #settings {
+    margin-top: 40px;
+  }
+  #settings label {
+    margin-top: 15px;
+  }
+
+  /* رسالة النجاح أو التنبيه */
+  .alert {
+    background-color: #d1fae5;
+    color: #065f46;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: none;
+  }
+
+  /* صغير شاشات الهاتف */
+  @media (max-width: 600px) {
+    #app {
+      width: 100%;
+      padding: 20px 25px 30px 25px;
+    }
+    button {
+      font-size: 1rem;
+      padding: 12px 20px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <h1>مدير كلمات المرور</h1>
+
+  <section id="authSection">
+    <div id="lockNotice"></div>
+
+    <div id="loginForm">
+      <label for="masterPasswordInput">كلمة المرور الرئيسية</label>
+      <input type="password" id="masterPasswordInput" autocomplete="current-password" placeholder="أدخل كلمة المرور الرئيسية" />
+      <button id="loginBtn">تسجيل الدخول</button>
+      <div id="authError" class="error"></div>
+      <hr style="margin:30px 0;" />
+      <label for="newMasterPasswordInput">إنشاء كلمة مرور رئيسية جديدة</label>
+      <input type="password" id="newMasterPasswordInput" autocomplete="new-password" placeholder="كلمة مرور جديدة (6 أحرف أو أكثر)" />
+      <button id="createMasterPasswordBtn">إنشاء كلمة مرور جديدة</button>
+    </div>
+  </section>
+
+  <section id="mainApp">
+    <section id="generator">
+      <label for="passLengthInput">طول كلمة المرور</label>
+      <input type="number" id="passLengthInput" value="16" min="6" max="32" />
+      <button id="generateBtn">توليد كلمة مرور</button>
+      <div id="generatedPassword" title="اضغط للنسخ">- - -</div>
+    </section>
+
+    <section id="addEntry">
+      <label for="usernameInput">اسم المستخدم / البريد الإلكتروني</label>
+      <input type="text" id="usernameInput" placeholder="مثلاً: user@example.com" />
+      <button id="saveBtn">حفظ السجل</button>
+    </section>
+
+    <section id="searchSection" style="margin-top: 35px;">
+      <label for="searchInput">بحث في السجلات</label>
+      <input type="text" id="searchInput" placeholder="ابحث هنا..." />
+    </section>
+
+    <section id="entriesSection" style="margin-top: 25px;">
+      <table id="entriesTable" aria-label="جدول كلمات المرور">
+        <thead>
+          <tr>
+            <th>اسم المستخدم</th>
+            <th>كلمة المرور</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- يتم تعبئة السجلات هنا -->
+        </tbody>
+      </table>
+    </section>
+
+    <section id="controls">
+      <button id="togglePasswordsBtn" class="btn-secondary">إظهار كلمات المرور</button>
+      <button id="toggleSortBtn" class="btn-secondary">⬆⬇ ترتيب أبجدي</button>
+      <button id="exportBtn" class="btn-secondary">تصدير السجلات</button>
+      <label for="importFileInput" style="background:#64748b; color:#fff; padding:14px 20px; border-radius:10px; cursor:pointer; user-select:none;">
+        استيراد السجلات
+        <input type="file" id="importFileInput" accept="application/json" style="display:none" />
+      </label>
+      <button id="logoutBtn" class="btn-secondary">تسجيل خروج</button>
+    </section>
+
+    <section id="settings" style="margin-top: 40px;">
+      <h2 style="margin-bottom: 20px; font-weight: 700; color:#334155;">تغيير كلمة المرور الرئيسية</h2>
+      <label for="oldMasterPasswordInput">كلمة المرور الحالية</label>
+      <input type="password" id="oldMasterPasswordInput" placeholder="أدخل كلمة المرور الحالية" />
+      <label for="newMasterPasswordChangeInput">كلمة المرور الجديدة</label>
+      <input type="password" id="newMasterPasswordChangeInput" placeholder="أدخل كلمة مرور جديدة" />
+      <button id="applyChangeMasterPasswordBtn">تغيير كلمة المرور</button>
+    </section>
+  </section>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // --- عناصر ---
+  const authSection = document.getElementById('authSection');
+  const mainApp = document.getElementById('mainApp');
+  const lockNotice = document.getElementById('lockNotice');
+
+  const masterPasswordInput = document.getElementById('masterPasswordInput');
+  const loginBtn = document.getElementById('loginBtn');
+  const authError = document.getElementById('authError');
+
+  const newMasterPasswordInput = document.getElementById('newMasterPasswordInput');
+  const createMasterPasswordBtn = document.getElementById('createMasterPasswordBtn');
+
+  const passLengthInput = document.getElementById('passLengthInput');
+  const generateBtn = document.getElementById('generateBtn');
+  const generatedPasswordSpan = document.getElementById('generatedPassword');
+
+  const usernameInput = document.getElementById('usernameInput');
+  const saveBtn = document.getElementById('saveBtn');
+
+  const searchInput = document.getElementById('searchInput');
+  const entriesTableBody = document.querySelector('#entriesTable tbody');
+
+  const togglePasswordsBtn = document.getElementById('togglePasswordsBtn');
+  const toggleSortBtn = document.getElementById('toggleSortBtn');
+  const exportBtn = document.getElementById('exportBtn');
+  const importFileInput = document.getElementById('importFileInput');
+
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  const oldMasterPasswordInput = document.getElementById('oldMasterPasswordInput');
+  const newMasterPasswordChangeInput = document.getElementById('newMasterPasswordChangeInput');
+  const applyChangeMasterPasswordBtn = document.getElementById('applyChangeMasterPasswordBtn');
+
+  // --- المتغيرات ---
+  let masterPassword = null;
+  let entriesCache = [];
+  let isShowingPasswords = false;
+  let sortAscending = true;
+  let failedAttempts = 0;
+  const MAX_FAILED_ATTEMPTS = 5;
+  const LOCK_TIME_MS = 5 * 60 * 1000; // 5 دقائق قفل عند تجاوز المحاولات
+  let lockTimeout = null;
+  let inactivityTimeout = null;
+  const INACTIVITY_LIMIT_MS = 10 * 60 * 1000; // 10 دقائق قفل تلقائي
+
+  // --- دوال تشفير/فك تشفير ---
+  async function deriveKey(password, salt, iterations = 100000) {
+    const enc = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+      "raw",
+      enc.encode(password),
+      {name: "PBKDF2"},
+      false,
+      ["deriveKey"]
+    );
+    return crypto.subtle.deriveKey(
+      {
+        name: "PBKDF2",
+        salt,
+        iterations,
+        hash: "SHA-256"
+      },
+      keyMaterial,
+      { name: "AES-GCM", length: 256 },
+      false,
+      ["encrypt", "decrypt"]
+    );
+  }
+
+  async function encryptData(data, password) {
+    const enc = new TextEncoder();
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const key = await deriveKey(password, salt);
+    const encodedData = enc.encode(JSON.stringify(data));
+    const encrypted = await crypto.subtle.encrypt(
+      { name: "AES-GCM", iv },
+      key,
+      encodedData
+    );
+    // تخزين salt و iv و البيانات مشفرة بشكل base64
+    return JSON.stringify({
+      salt: btoa(String.fromCharCode(...salt)),
+      iv: btoa(String.fromCharCode(...iv)),
+      data: btoa(String.fromCharCode(...new Uint8Array(encrypted)))
+    });
+  }
+
+  async function decryptData(encryptedText, password) {
+    const dec = new TextDecoder();
+    let obj;
+    try {
+      obj = JSON.parse(encryptedText);
+    } catch {
+      throw new Error('بيانات غير صالحة');
+    }
+    const salt = Uint8Array.from(atob(obj.salt), c => c.charCodeAt(0));
+    const iv = Uint8Array.from(atob(obj.iv), c => c.charCodeAt(0));
+    const data = Uint8Array.from(atob(obj.data), c => c.charCodeAt(0));
+    const key = await deriveKey(password, salt);
+    try {
+      const decrypted = await crypto.subtle.decrypt(
+        { name: "AES-GCM", iv },
+        key,
+        data
+      );
+      return JSON.parse(dec.decode(decrypted));
+    } catch {
+      throw new Error('كلمة مرور خاطئة أو بيانات تالفة');
+    }
+  }
+
+  // --- تحميل السجلات ---
+  async function loadEntries(pwd) {
+    const encrypted = localStorage.getItem('passwordEntries');
+    if(!encrypted) return [];
+    return await decryptData(encrypted, pwd);
+  }
+
+  // --- حفظ السجلات ---
+  async function saveEntries(entries) {
+    if(!masterPassword) throw new Error("لا توجد كلمة مرور رئيسية");
+    const encrypted = await encryptData(entries, masterPassword);
+    localStorage.setItem('passwordEntries', encrypted);
+  }
+
+  // --- توليد كلمة مرور عشوائية ---
+  function generatePassword(length) {
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+[]{}|;:,.<>?";
+    let pwd = "";
+    for(let i=0; i<length; i++) {
+      pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return pwd;
+  }
+
+  // --- فحص قوة كلمة المرور ---
+  function isStrongPassword(pwd) {
+    // شرط بسيط: 1 حرف صغير، 1 كبير، 1 رقم، 1 رمز خاص، وطول >= 8
+    return (
+      /[a-z]/.test(pwd) &&
+      /[A-Z]/.test(pwd) &&
+      /\d/.test(pwd) &&
+      /[!@#$%^&*()_+\[\]{}|;:,.<>?]/.test(pwd) &&
+      pwd.length >= 8
+    );
+  }
+
+  // --- عرض السجلات ---
+  async function renderEntries() {
+    const filter = searchInput.value.trim();
+    let filtered = entriesCache;
+    if(filter) {
+      filtered = filtered.filter(e => e.username.includes(filter));
+    }
+    filtered.sort((a, b) => {
+      if(a.username < b.username) return sortAscending ? -1 : 1;
+      if(a.username > b.username) return sortAscending ? 1 : -1;
+      return 0;
+    });
+    entriesTableBody.innerHTML = '';
+    if(filtered.length === 0) {
+      entriesTableBody.innerHTML = `<tr><td colspan="2" style="text-align:center; padding:20px; color:#64748b;">لا توجد سجلات</td></tr>`;
+      return;
+    }
+    for(const entry of filtered) {
+      const tr = document.createElement('tr');
+
+      const tdUser = document.createElement('td');
+      tdUser.textContent = entry.username;
+
+      const tdPass = document.createElement('td');
+      tdPass.classList.add('passwordCell');
+      if(!isShowingPasswords) {
+        tdPass.textContent = entry.password.replace(/./g, '•');
+        tdPass.classList.add('hiddenPass');
+      } else {
+        tdPass.textContent = entry.password;
+        tdPass.classList.remove('hiddenPass');
+      }
+      // عند الضغط على كلمة المرور، يتم نسخها
+      tdPass.style.cursor = 'pointer';
+      tdPass.title = 'اضغط للنسخ';
+      tdPass.onclick = () => {
+        navigator.clipboard.writeText(entry.password);
+        alert(`تم نسخ كلمة المرور الخاصة بـ "${entry.username}"`);
+      };
+
+      tr.appendChild(tdUser);
+      tr.appendChild(tdPass);
+      entriesTableBody.appendChild(tr);
+    }
+  }
+
+  // --- قفل النظام عند محاولات خاطئة كثيرة ---
+  function lockSystem() {
+    authError.textContent = "تم قفل النظام مؤقتًا بسبب محاولات خاطئة عديدة. حاول مرة أخرى بعد 5 دقائق.";
+    lockNotice.style.display = 'block';
+    lockNotice.textContent = "النظام مقفل مؤقتًا بسبب محاولات تسجيل دخول خاطئة.";
+    loginBtn.disabled = true;
+    createMasterPasswordBtn.disabled = true;
+    masterPasswordInput.disabled = true;
+    newMasterPasswordInput.disabled = true;
+
+    lockTimeout = setTimeout(() => {
+      authError.textContent = '';
+      lockNotice.style.display = 'none';
+      loginBtn.disabled = false;
+      createMasterPasswordBtn.disabled = false;
+      masterPasswordInput.disabled = false;
+      newMasterPasswordInput.disabled = false;
+      failedAttempts = 0;
+    }, LOCK_TIME_MS);
+  }
+
+  // --- قفل النظام تلقائي بعد فترة عدم نشاط ---
+  function resetInactivityTimer() {
+    if(inactivityTimeout) clearTimeout(inactivityTimeout);
+    inactivityTimeout = setTimeout(() => {
+      logout();
+      alert('تم تسجيل الخروج تلقائيًا بعد فترة من عدم النشاط.');
+    }, INACTIVITY_LIMIT_MS);
+  }
+
+  // --- تسجيل الدخول ---
+  async function login() {
+    authError.textContent = '';
+    if(lockTimeout) {
+      authError.textContent = 'النظام مقفل مؤقتًا. حاول لاحقًا.';
+      return;
+    }
+    const pwd = masterPasswordInput.value.trim();
+    if(!pwd) {
+      authError.textContent = 'يرجى إدخال كلمة المرور الرئيسية.';
+      return;
+    }
+    try {
+      const entries = await loadEntries(pwd);
+      masterPassword = pwd;
+      entriesCache = entries;
+      masterPasswordInput.value = '';
+      showMainApp();
+      failedAttempts = 0;
+      resetInactivityTimer();
+    } catch (e) {
+      failedAttempts++;
+      authError.textContent = 'كلمة المرور غير صحيحة.';
+      if(failedAttempts >= MAX_FAILED_ATTEMPTS) lockSystem();
+    }
+  }
+
+  // --- إنشاء كلمة مرور رئيسية جديدة ---
+  async function createMasterPassword() {
+    authError.textContent = '';
+    const pwd = newMasterPasswordInput.value.trim();
+    if(pwd.length < 6) {
+      authError.textContent = 'كلمة المرور يجب أن تكون 6 أحرف أو أكثر.';
+      return;
+    }
+    // تأكيد عدم وجود بيانات محفوظة من قبل
+    if(localStorage.getItem('passwordEntries')) {
+      if(!confirm('سيتم حذف السجلات الحالية عند إنشاء كلمة مرور جديدة. هل تريد المتابعة؟')) return;
+      localStorage.removeItem('passwordEntries');
+    }
+    masterPassword = pwd;
+    entriesCache = [];
+    await saveEntries(entriesCache);
+    newMasterPasswordInput.value = '';
+    showMainApp();
+    resetInactivityTimer();
+  }
+
+  // --- عرض التطبيق الرئيسي ---
+  function showMainApp() {
+    authSection.style.display = 'none';
+    mainApp.style.display = 'block';
+    renderEntries();
+  }
+
+  // --- تسجيل خروج ---
+  function logout() {
+    masterPassword = null;
+    entriesCache = [];
+    authSection.style.display = 'block';
+    mainApp.style.display = 'none';
+    lockNotice.style.display = 'none';
+    authError.textContent = '';
+    if(lockTimeout) {
+      clearTimeout(lockTimeout);
+      lockTimeout = null;
+    }
+    if(inactivityTimeout) {
+      clearTimeout(inactivityTimeout);
+      inactivityTimeout = null;
+    }
+  }
+
+  // --- توليد كلمة مرور ---
+  function generateAndShowPassword() {
+    const length = parseInt(passLengthInput.value);
+    if(isNaN(length) || length < 6 || length > 32) {
+      alert('يرجى إدخال طول كلمة المرور بين 6 و 32');
+      return;
+    }
+    const pwd = generatePassword(length);
+    generatedPasswordSpan.textContent = pwd;
+  }
+
+  // --- حفظ سجل جديد ---
+  async function saveEntry() {
+    resetInactivityTimer();
+    const username = usernameInput.value.trim();
+    const password = generatedPasswordSpan.textContent;
+    if(!username) {
+      alert('يرجى إدخال اسم المستخدم أو البريد الإلكتروني');
+      return;
+    }
+    if(!password || password === '- - -') {
+      alert('يرجى توليد كلمة مرور أولاً');
+      return;
+    }
+    const exists = entriesCache.find(e => e.username === username);
+    if(exists) {
+      if(!confirm('السجل موجود مسبقًا. هل تريد استبداله؟')) return;
+      exists.password = password;
+    } else {
+      entriesCache.push({ username, password });
+    }
+    await saveEntries(entriesCache);
+    usernameInput.value = '';
+    generatedPasswordSpan.textContent = '- - -';
+    renderEntries();
+    alert('تم حفظ السجل بنجاح');
+  }
+
+  // --- تبديل إظهار/إخفاء كلمات المرور ---
+  function togglePasswords() {
+    isShowingPasswords = !isShowingPasswords;
+    togglePasswordsBtn.textContent = isShowingPasswords ? 'إخفاء كلمات المرور' : 'إظهار كلمات المرور';
+    renderEntries();
+  }
+
+  // --- تبديل ترتيب الجدول أبجديًا ---
+  function toggleSort() {
+    sortAscending = !sortAscending;
+    toggleSortBtn.textContent = sortAscending ? '⬆⬇ ترتيب أبجدي' : '⬇⬆ ترتيب عكسي';
+    renderEntries();
+  }
+
+  // --- تصدير السجلات كملف JSON ---
+  function exportEntries() {
+    const blob = new Blob([JSON.stringify(entriesCache, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "passwordEntries.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  // --- استيراد السجلات من ملف JSON ---
+  async function importEntries(event) {
+    resetInactivityTimer();
+    const file = event.target.files[0];
+    if(!file) return;
+    const text = await file.text();
+    try {
+      const imported = JSON.parse(text);
+      if(!Array.isArray(imported)) throw new Error('تنسيق غير صحيح');
+      if(!confirm('هل تريد استبدال السجلات الحالية بالسجلات المستوردة؟')) return;
+      entriesCache = imported.filter(e => e.username && e.password);
+      await saveEntries(entriesCache);
+      renderEntries();
+      alert('تم استيراد السجلات بنجاح');
+    } catch {
+      alert('فشل في استيراد الملف. يرجى التحقق من التنسيق.');
+    }
+    importFileInput.value = ''; // إعادة تعيين الحقل
+  }
+
+  // --- تغيير كلمة المرور الرئيسية ---
+  async function changeMasterPassword() {
+    resetInactivityTimer();
+    const oldPwd = oldMasterPasswordInput.value.trim();
+    const newPwd = newMasterPasswordChangeInput.value.trim();
+
+    if(!oldPwd || !newPwd) {
+      alert('يرجى ملء جميع الحقول.');
+      return;
+    }
+    if(newPwd.length < 6) {
+      alert('كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل.');
+      return;
+    }
+    if(oldPwd !== masterPassword) {
+      alert('كلمة المرور الحالية غير صحيحة.');
+      return;
+    }
+    try {
+      // إعادة تشفير السجلات بكلمة المرور الجديدة
+      const encrypted = await encryptData(entriesCache, newPwd);
+      localStorage.setItem('passwordEntries', encrypted);
+      masterPassword = newPwd;
+      oldMasterPasswordInput.value = '';
+      newMasterPasswordChangeInput.value = '';
+      alert('تم تغيير كلمة المرور الرئيسية بنجاح.');
+    } catch {
+      alert('حدث خطأ أثناء تغيير كلمة المرور.');
+    }
+  }
+
+  // --- نسخ كلمة المرور عند الضغط ---
+  generatedPasswordSpan.onclick = () => {
+    if(generatedPasswordSpan.textContent && generatedPasswordSpan.textContent !== '- - -') {
+      navigator.clipboard.writeText(generatedPasswordSpan.textContent);
+      alert('تم نسخ كلمة المرور');
+    }
+  };
+
+  // --- الأحداث ---
+  loginBtn.onclick = login;
+  createMasterPasswordBtn.onclick = createMasterPassword;
+  generateBtn.onclick = generateAndShowPassword;
+  saveBtn.onclick = saveEntry;
+  togglePasswordsBtn.onclick = togglePasswords;
+  toggleSortBtn.onclick = toggleSort;
+  exportBtn.onclick = exportEntries;
+  importFileInput.onchange = importEntries;
+  logoutBtn.onclick = logout;
+  applyChangeMasterPasswordBtn.onclick = changeMasterPassword;
+  searchInput.oninput = renderEntries;
+
+  // --- تفعيل تسجيل الخروج تلقائي بعد نشاط ---
+  ['click', 'keydown', 'mousemove', 'touchstart'].forEach(evt =>
+    document.addEventListener(evt, () => {
+      if(masterPassword) resetInactivityTimer();
+    })
+  );
+
+  // --- بدء ---
+  // عرض القسم المناسب (لو توجد كلمة مرور)
+  if(localStorage.getItem('passwordEntries')) {
+    authSection.style.display = 'block';
+    mainApp.style.display = 'none';
+  } else {
+    // لا توجد كلمة مرور مخزنة: يعرض إنشاء كلمة مرور جديدة
+    authSection.style.display = 'block';
+    mainApp.style.display = 'none';
+  }
+
+})();
+</script>
+
+</body>
+</html>
